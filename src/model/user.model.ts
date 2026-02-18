@@ -5,7 +5,7 @@ export interface UserDocument extends Document {
   email: string;
   username: string;
   password: string;
-  role: "hostelManager" | "landlord";
+  role: "hostelManager" | "landlord" | "student";
 
   comparePassword: (candidatePassword: string) => Promise<boolean>;
 
@@ -34,7 +34,7 @@ const userSchema = new Schema<UserDocument>(
     },
     role: {
       type: String,
-      enum: ["hostelManager", "landlord"],
+      enum: ["hostelManager", "landlord", "student"],
     },
   },
   {
