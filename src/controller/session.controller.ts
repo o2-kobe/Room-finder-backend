@@ -31,8 +31,8 @@ export async function createSessionHandler(req: Request, res: Response) {
     // Set secure httpOnly cookie
     res.cookie("refreshToken", rawRefreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: false,
+      sameSite: "lax",
       path: "/api/sessions/refresh",
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
@@ -49,7 +49,7 @@ export async function createSessionHandler(req: Request, res: Response) {
     return res.status(200).json({ accessToken });
   } catch (error) {
     logger.error(error);
-    return res.status(401).json({
+    res.status(401).json({
       status: "error",
       message: "Failed to log in",
     });
@@ -91,6 +91,10 @@ export async function refreshAccessTokenHandler(req: Request, res: Response) {
     const result = await reIssueAccessToken({ refreshToken });
 
     if (!result) {
+      res.clearCookie("refreshToken", {
+        path: "/api/sessions/refresh",
+      });
+
       return res.status(401).json({
         status: "error",
         message: "Invalid refresh token",
@@ -100,18 +104,18 @@ export async function refreshAccessTokenHandler(req: Request, res: Response) {
     // Rotate cookie
     res.cookie("refreshToken", result.refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      secure: false,
+      sameSite: "lax",
       path: "/api/sessions/refresh",
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 
-    return res.status(200).json({
+    res.status(200).json({
       accessToken: result.accessToken,
     });
   } catch (error) {
     logger.error(error);
-    return res.status(500).json({
+    res.status(500).json({
       status: "error",
       message: "Could not refresh token",
     });
