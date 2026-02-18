@@ -1,0 +1,73 @@
+import { model, Schema, Document } from "mongoose";
+import argon2 from "argon2";
+
+export interface UserDocument extends Document {
+  email: string;
+  username: string;
+  password: string;
+  role: "hostelManager" | "landlord";
+
+  comparePassword: (candidatePassword: string) => Promise<boolean>;
+
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const userSchema = new Schema<UserDocument>(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true,
+    },
+
+    username: { type: String, required: true },
+    password: {
+      type: String,
+      required: true,
+      minLength: 8,
+      maxLength: 64,
+      select: false,
+    },
+    role: {
+      type: String,
+      enum: ["hostelManager", "landlord"],
+    },
+  },
+  {
+    timestamps: true,
+  },
+);
+
+userSchema.pre("save", async function () {
+  if (this.isModified("password")) {
+    this.password = await argon2.hash(this.password, {
+      type: argon2.argon2id,
+      memoryCost: 2 ** 16, // 64MB
+      timeCost: 3,
+      parallelism: 1,
+    });
+  }
+});
+
+userSchema.set("toJSON", {
+  virtuals: true,
+  versionKey: false,
+  transform: (_doc, ret: any) => {
+    ret.id = ret._id;
+    delete ret._id;
+  },
+});
+
+userSchema.methods.comparePassword = async function (
+  candidatePassword: string,
+): Promise<boolean> {
+  return await argon2.verify(this.password, candidatePassword);
+};
+
+const User = model<UserDocument>("User", userSchema);
+
+export default User;
