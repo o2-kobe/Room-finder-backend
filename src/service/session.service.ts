@@ -1,7 +1,7 @@
 import { QueryFilter, UpdateQuery } from "mongoose";
 import Session, { Session as SessionDocument } from "../model/session.model";
 import { signJwt, verifyJwt } from "../utils/jwt.utils";
-import { get } from "lodash";
+import { StringValue } from "ms";
 import User from "../model/user.model";
 import config from "config";
 import crypto from "crypto";
@@ -40,7 +40,7 @@ export async function updateSession(
   return await Session.updateOne(query, update);
 }
 
-const accessTokenTtl = config.get<string>("accessTokenTtl");
+const accessTokenTtl = config.get<StringValue>("accessTokenTtl");
 
 export async function reIssueAccessToken({
   refreshToken,
@@ -71,7 +71,7 @@ export async function reIssueAccessToken({
       role: user.role,
       session: session._id,
     },
-    { expiresIn: Number(accessTokenTtl) },
+    { expiresIn: accessTokenTtl },
   );
 
   return {

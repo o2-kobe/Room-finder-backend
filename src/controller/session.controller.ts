@@ -8,9 +8,10 @@ import {
 } from "../service/session.service";
 import config from "config";
 import logger from "./../utils/logger";
+import { StringValue } from "ms";
 import { signJwt } from "../utils/jwt.utils";
 
-const accessTokenTtl = config.get<string>("accessTokenTtl");
+const accessTokenTtl = config.get<StringValue>("accessTokenTtl");
 
 export async function createSessionHandler(req: Request, res: Response) {
   try {
@@ -42,7 +43,7 @@ export async function createSessionHandler(req: Request, res: Response) {
         role: user.role,
         session: session._id,
       },
-      { expiresIn: Number(accessTokenTtl) },
+      { expiresIn: accessTokenTtl },
     );
 
     return res.status(200).json({ accessToken });
