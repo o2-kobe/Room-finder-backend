@@ -1,6 +1,6 @@
 import { Response, Request } from "express";
 import { CreateUserRequest } from "../schema/user.schema";
-import { createUser, deleteUser } from "../service/user.service";
+import { createUser, deleteUser, getUser } from "../service/user.service";
 import logger from "./../utils/logger";
 
 export async function createUserHandler(
@@ -14,6 +14,21 @@ export async function createUserHandler(
   } catch (error) {
     logger.error(error);
     res.status(500).json({ status: "error", message: "Failed to create user" });
+  }
+}
+
+export async function getUserHandler(req: Request, res: Response) {
+  try {
+    const userId = res.locals.user._id;
+    const user = await getUser(userId);
+
+    res.status(200).json({ status: "success", data: user });
+  } catch (error: any) {
+    logger.error(error);
+    res.status(500).json({
+      status: "error",
+      message: error.message || "Failed to find user",
+    });
   }
 }
 

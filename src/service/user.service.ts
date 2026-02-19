@@ -1,6 +1,7 @@
 import { QueryFilter } from "mongoose";
 import User, { UserDocument } from "../model/user.model";
 import { CreateUserInput } from "../schema/user.schema";
+
 export async function createUser(input: CreateUserInput) {
   const { email, password, username, role } = input;
   return await User.create({
@@ -12,6 +13,16 @@ export async function createUser(input: CreateUserInput) {
 
 export async function findUser(query: QueryFilter<UserDocument>) {
   const user = await User.findOne(query);
+
+  if (!user) {
+    throw new Error("Invalid credentials");
+  }
+
+  return user;
+}
+
+export async function getUser(userId: string) {
+  const user = await User.findById(userId);
 
   if (!user) {
     throw new Error("Invalid credentials");
