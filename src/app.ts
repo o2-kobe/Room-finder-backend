@@ -1,26 +1,17 @@
-// // import cookieParser from "cookie-parser";
-
-// // app.use(cookieParser());
-
-// app.use(cors({
-//   origin: "https://yourfrontend.com",
-//   credentials: true,
-// }));
-
-// if hosting on vercel, render, nginx
-// app.set("trust proxy", 1);
-
 import express from "express";
 import cookieParser from "cookie-parser";
 import routes from "./routes";
 import cors from "cors";
+import config from "config";
+import logger from "./utils/logger";
+import connect from "./utils/connect";
 
+const PORT = config.get<number>("port");
 const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
 
-// All routes mounted here
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -28,7 +19,13 @@ app.use(
   }),
 );
 
+// All routes mounted here
 app.use("/api", routes);
 
-// Port is 5000
+app.listen(PORT, async () => {
+  logger.info(`App connected successfully at ${PORT}...`);
+
+  await connect();
+});
+
 export default app;
