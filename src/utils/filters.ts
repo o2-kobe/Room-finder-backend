@@ -1,9 +1,9 @@
 import { QueryFilter } from "mongoose";
-import Listing, { ListingDocument, RoomType } from "../model/listing.model";
+import { ListingDocument, RoomType } from "../model/listing.model";
 
 export interface ListingFilters {
   listingType?: "hostel" | "private";
-  availabilityStatus?: "available" | "occupied";
+  availabilityStatus?: "available" | "inactive";
   price?: number;
   search?: string;
 }
@@ -13,21 +13,21 @@ export function buildFilterQuery(
 ): QueryFilter<ListingDocument> {
   const conditions: QueryFilter<ListingDocument>[] = [];
 
-  // 1️⃣ Listing Type
+  //  Listing Type
   if (filters.listingType) {
     conditions.push({
       listingType: filters.listingType,
     });
   }
 
-  // 2️⃣ Availability
+  // Availability
   if (filters.availabilityStatus) {
     conditions.push({
       availabilityStatus: filters.availabilityStatus,
     });
   }
 
-  // 3️⃣ Price Filtering (max budget logic)
+  // Price Filtering (max budget logic)
   if (filters.price) {
     conditions.push({
       $or: [
@@ -46,10 +46,10 @@ export function buildFilterQuery(
     });
   }
 
-  // 4️⃣ Search (title + university + area)
+  // Search (title + university + area)
   if (filters.search) {
     conditions.push({
-      $text: { $search: filters.search },
+      $text: { $search: filters.search?.trim() },
     });
   }
 
