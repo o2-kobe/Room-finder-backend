@@ -3,12 +3,7 @@ import User, { UserDocument } from "../model/user.model";
 import { CreateUserInput } from "../schema/user.schema";
 
 export async function createUser(input: CreateUserInput) {
-  const { email, password, username, role } = input;
-  return await User.create({
-    email: email.toLowerCase().trim(),
-    password,
-    username,
-  });
+  return await User.create(input);
 }
 
 export async function findUser(query: QueryFilter<UserDocument>) {
