@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createUserHandler,
   deleteUserHandler,
+  getUserHandler,
 } from "./controller/user.controller";
 import {
   createSessionHandler,
@@ -11,30 +12,104 @@ import {
 } from "./controller/session.controller";
 import { requireUser } from "./middleware/requireUser";
 import { loginLimiter } from "./middleware/rateLimit";
+import validateResource from "./middleware/validateResource";
+import { createUserSchema } from "./schema/user.schema";
+import { createSessionSchema } from "./schema/session.schema";
+import {
+  createListingHandler,
+  deleteListingHandler,
+  findOneListingHandler,
+  getListingsHandler,
+  getMapsListingsHandler,
+  markListingAsAvailableHandler,
+  markListingAsInactiveHandler,
+  updateListingHandler,
+} from "./controller/listing.controller";
+import {
+  createListingSchema,
+  listingParamsSchema,
+  listingQuerySchema,
+  updateListingSchema,
+} from "./schema/listing.schema";
 
 const router = Router();
 
-/**
- * =========================
- * User Routes
- * =========================
- */
-router.post("/users", createUserHandler);
+// User Routes
+router.post("/users", validateResource(createUserSchema), createUserHandler);
+router.get("/users", requireUser, getUserHandler);
 router.delete("/users", requireUser, deleteUserHandler);
 
-/**
- * =========================
- * Session Routes
- * =========================
- */
-
-// 🚨 Rate limit login attempts
-router.post("/sessions", loginLimiter, createSessionHandler);
+// Session Routes
+router.post(
+  "/sessions",
+  loginLimiter,
+  validateResource(createSessionSchema),
+  createSessionHandler,
+);
 
 router.get("/sessions", requireUser, getSessionsHandler);
 router.delete("/sessions", requireUser, deleteSessionHandler);
 
-// Optional: also rate-limit refresh
 router.post("/sessions/refresh", loginLimiter, refreshAccessTokenHandler);
+
+// Listing Routes
+// ---------------------------
+router.use(requireUser);
+
+// Create a listing
+router.post(
+  "/listings",
+  validateResource(createListingSchema),
+  createListingHandler,
+);
+
+// Find one listing
+router.get(
+  "/listings/:id",
+  validateResource(listingParamsSchema),
+  findOneListingHandler,
+);
+
+// Delete listing
+router.delete(
+  "/listings/:id",
+  validateResource(listingParamsSchema),
+  deleteListingHandler,
+);
+
+// Update listing body
+router.patch(
+  "/listings/:id",
+  validateResource(updateListingSchema),
+  updateListingHandler,
+);
+
+// Get paginated listings
+router.get(
+  "/listings",
+  validateResource(listingQuerySchema),
+  getListingsHandler,
+);
+
+// Get Map listings
+router.get(
+  "/listings/map",
+  validateResource(listingQuerySchema),
+  getMapsListingsHandler,
+);
+
+// Mark Listing as available
+router.patch(
+  "/listings/markAvailable/:id",
+  validateResource(listingParamsSchema),
+  markListingAsAvailableHandler,
+);
+
+// Mark listing as inactive
+router.patch(
+  "/listings/markListingInactive/:id",
+  validateResource(listingParamsSchema),
+  markListingAsInactiveHandler,
+);
 
 export default router;
