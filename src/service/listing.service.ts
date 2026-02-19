@@ -99,10 +99,9 @@ export async function deleteListing(listingId: string, createdBy: string) {
 }
 
 // Update Listing Availability
-export async function updateListingAvailability(
+export async function markListingAsAvailable(
   listingId: string,
   createdBy: string,
-  availabilityStatus: "available" | "inactive",
 ) {
   const user = await User.findById(createdBy).lean();
 
@@ -114,7 +113,30 @@ export async function updateListingAvailability(
 
   const result = await Listing.findByIdAndUpdate(
     listingId,
-    { availabilityStatus },
+    { availabilityStatus: "inactive" },
+    { new: true },
+  );
+
+  if (!result) throw Errors.badRequest("Failed to update listing");
+
+  return result;
+}
+
+export async function markListingAsInactive(
+  listingId: string,
+  createdBy: string,
+) {
+  const user = await User.findById(createdBy).lean();
+
+  if (!user) throw Errors.forbidden("User does not exist");
+
+  const listing = await Listing.findOne({ _id: listingId, createdBy });
+
+  if (!listing) throw Errors.notFound("Listing does not exist");
+
+  const result = await Listing.findByIdAndUpdate(
+    listingId,
+    { availabilityStatus: "available" },
     { new: true },
   );
 
