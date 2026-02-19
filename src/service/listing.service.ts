@@ -86,10 +86,6 @@ export async function getListingById(listingId: string) {
 
 // Delete listing
 export async function deleteListing(listingId: string, createdBy: string) {
-  const user = await User.findById(createdBy).lean();
-
-  if (!user) throw Errors.forbidden("User does not exist");
-
   const deletedListing = await Listing.findOneAndDelete({
     _id: listingId,
     createdBy,
@@ -103,10 +99,6 @@ export async function markListingAsAvailable(
   listingId: string,
   createdBy: string,
 ) {
-  const user = await User.findById(createdBy).lean();
-
-  if (!user) throw Errors.forbidden("User does not exist");
-
   const listing = await Listing.findOne({ _id: listingId, createdBy });
 
   if (!listing) throw Errors.notFound("Listing does not exist");
@@ -126,10 +118,6 @@ export async function markListingAsInactive(
   listingId: string,
   createdBy: string,
 ) {
-  const user = await User.findById(createdBy).lean();
-
-  if (!user) throw Errors.forbidden("User does not exist");
-
   const listing = await Listing.findOne({ _id: listingId, createdBy });
 
   if (!listing) throw Errors.notFound("Listing does not exist");
@@ -151,10 +139,6 @@ export async function updateListing(
   createdBy: string,
   update: UpdateListingInput,
 ) {
-  const user = await User.findById(createdBy).lean();
-
-  if (!user) throw Errors.forbidden("User does not exist");
-
   const listing = await Listing.findOne({ _id: listingId, createdBy });
 
   if (!listing) throw Errors.notFound("Listing does not exist");
