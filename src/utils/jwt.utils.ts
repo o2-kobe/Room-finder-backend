@@ -1,8 +1,7 @@
 import jwt, { SignOptions, JwtPayload } from "jsonwebtoken";
 import config from "config";
 
-const privateKey = config.get<string>("privateKey");
-const publicKey = config.get<string>("publicKey");
+const JWT_SECRET = config.get<string>("JWT_SECRET");
 const issuer = config.get<string>("issuer");
 const audience = config.get<string>("audience");
 
@@ -13,8 +12,8 @@ export interface AccessTokenPayload extends JwtPayload {
 }
 
 export function signJwt(payload: object, options?: SignOptions): string {
-  return jwt.sign(payload, privateKey, {
-    algorithm: "RS256",
+  return jwt.sign(payload, JWT_SECRET, {
+    algorithm: "HS256",
     issuer,
     audience,
     ...options,
@@ -27,8 +26,8 @@ export function verifyJwt(token: string): {
   expired: boolean;
 } {
   try {
-    const decoded = jwt.verify(token, publicKey, {
-      algorithms: ["RS256"],
+    const decoded = jwt.verify(token, JWT_SECRET, {
+      algorithms: ["HS256"],
       issuer,
       audience,
     }) as AccessTokenPayload;
