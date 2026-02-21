@@ -44,8 +44,7 @@ export async function getListings(
 
   const listings = await Listing.find(query)
     .sort({ _id: -1 })
-    .limit(limit + 1)
-    .lean();
+    .limit(limit + 1);
 
   let nextCursor: string | null = null;
 
@@ -62,15 +61,13 @@ export async function getListings(
 export async function getMapListings(filters: ListingFilters) {
   const query = buildFilterQuery(filters);
 
-  const listings = await Listing.find(query)
-    .select({
-      title: 1,
-      listingType: 1,
-      pricing: 1,
-      availabilityStatus: 1,
-      location: 1,
-    })
-    .lean();
+  const listings = await Listing.find(query).select({
+    title: 1,
+    listingType: 1,
+    pricing: 1,
+    availabilityStatus: 1,
+    location: 1,
+  });
 
   return listings;
 }
@@ -105,8 +102,8 @@ export async function markListingAsAvailable(
 
   const result = await Listing.findByIdAndUpdate(
     listingId,
-    { availabilityStatus: "inactive" },
-    { new: true },
+    { availabilityStatus: "available" },
+    { returnDocument: "after" },
   );
 
   if (!result) throw Errors.badRequest("Failed to update listing");
@@ -124,8 +121,8 @@ export async function markListingAsInactive(
 
   const result = await Listing.findByIdAndUpdate(
     listingId,
-    { availabilityStatus: "available" },
-    { new: true },
+    { availabilityStatus: "inactive" },
+    { returnDocument: "after" },
   );
 
   if (!result) throw Errors.badRequest("Failed to update listing");
@@ -147,7 +144,7 @@ export async function updateListing(
     throw Errors.conflict("You cannot change listing type");
 
   const result = await Listing.findByIdAndUpdate(listingId, update, {
-    new: true,
+    returnDocument: "after",
     runValidators: true,
   });
 

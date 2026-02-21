@@ -38,7 +38,7 @@ const baseListingBody = z.object({
   amenities: z.array(z.string()).optional(),
   location: locationSchema,
   pricing: pricingSchema,
-  roomType: z
+  roomTypes: z
     .enum([
       "1-in-a-room",
       "2-in-a-room",
@@ -146,7 +146,7 @@ export const listingQuerySchema = z.object({
         .optional(), //ensure it is a mongodb id
       limit: z.coerce.number().min(10).max(30).default(15),
     })
-    .strict(),
+    .loose(),
 });
 
 export type ListingQuery = z.infer<typeof listingQuerySchema>["query"];

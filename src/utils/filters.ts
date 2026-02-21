@@ -1,5 +1,5 @@
 import { QueryFilter } from "mongoose";
-import { ListingDocument, RoomType } from "../model/listing.model";
+import { ListingDocument, RoomTypes } from "../model/listing.model";
 
 export interface ListingFilters {
   listingType?: "hostel" | "private";
@@ -49,7 +49,7 @@ export function buildFilterQuery(
   // Search (title + university + area)
   if (filters.search) {
     conditions.push({
-      $text: { $search: filters.search?.trim() },
+      $text: { $search: filters.search?.toLowerCase().trim() },
     });
   }
 

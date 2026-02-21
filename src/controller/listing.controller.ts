@@ -16,7 +16,7 @@ import { AppError } from "../utils/AppError";
 
 export const createListingHandler = TryCatch(
   async (req: Request, res: Response) => {
-    const userId = res.locals.user._id;
+    const userId = res.locals.user.sub;
     const listingData = req.body;
 
     const listing = await createListing(listingData, userId);
@@ -38,11 +38,13 @@ export const getListingsHandler = async (
 
     const { cursor, limit, ...filters } = query;
 
-    const listings = await getListings(filters, cursor, limit);
+    const { listings, nextCursor } = await getListings(filters, cursor, limit);
 
     res.status(200).json({
       status: "success",
+      results: listings.length,
       data: listings,
+      nextCursor,
     });
   } catch (error: any) {
     logger.error(`GetListingsHandler error: ${error} `);
@@ -81,6 +83,7 @@ export const getMapsListingsHandler = async (
 
     res.status(200).json({
       status: "success",
+      results: listings.length,
       data: listings,
     });
   } catch (error: any) {
@@ -120,7 +123,7 @@ export const findOneListingHandler = TryCatch(
 
 export const deleteListingHandler = TryCatch(
   async (req: Request, res: Response) => {
-    const userId = res.locals.user._id;
+    const userId = res.locals.user.sub;
     const listingId = req.params.id as string;
 
     await deleteListing(listingId, userId);
@@ -136,7 +139,7 @@ export const updateListingHandler = TryCatch(
   async (req: Request, res: Response) => {
     const listingId = req.params.id as string;
     const update = req.body;
-    const userId = res.locals.user._id;
+    const userId = res.locals.user.sub;
 
     const updatedListing = await updateListing(listingId, userId, update);
 
@@ -148,7 +151,7 @@ export const updateListingHandler = TryCatch(
 export const markListingAsAvailableHandler = TryCatch(
   async (req: Request, res: Response) => {
     const listingId = req.params.id as string;
-    const userId = res.locals.user._id;
+    const userId = res.locals.user.sub;
 
     const availableListing = await markListingAsAvailable(listingId, userId);
 
@@ -160,7 +163,7 @@ export const markListingAsAvailableHandler = TryCatch(
 export const markListingAsInactiveHandler = TryCatch(
   async (req: Request, res: Response) => {
     const listingId = req.params.id as string;
-    const userId = res.locals.user._id;
+    const userId = res.locals.user.sub;
 
     const inactiveListing = await markListingAsInactive(listingId, userId);
 
