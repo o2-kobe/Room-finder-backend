@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Request, Response, Router } from "express";
 import {
   createUserHandler,
   deleteUserHandler,
@@ -28,11 +28,14 @@ import {
 import {
   createListingSchema,
   listingParamsSchema,
-  listingQuerySchema,
   updateListingSchema,
 } from "./schema/listing.schema";
 
 const router = Router();
+
+router.get("/", async (_req: Request, res: Response) => {
+  res.send("HEy");
+});
 
 // User Routes
 router.post("/users", validateResource(createUserSchema), createUserHandler);
@@ -63,6 +66,12 @@ router.post(
   createListingHandler,
 );
 
+// Get paginated listings
+router.get("/listings", getListingsHandler);
+
+// Get Map listings
+router.get("/listings/map", getMapsListingsHandler);
+
 // Find one listing
 router.get(
   "/listings/:id",
@@ -84,20 +93,6 @@ router.patch(
   updateListingHandler,
 );
 
-// Get paginated listings
-router.get(
-  "/listings",
-  validateResource(listingQuerySchema),
-  getListingsHandler,
-);
-
-// Get Map listings
-router.get(
-  "/listings/map",
-  validateResource(listingQuerySchema),
-  getMapsListingsHandler,
-);
-
 // Mark Listing as available
 router.patch(
   "/listings/markAvailable/:id",
@@ -107,7 +102,7 @@ router.patch(
 
 // Mark listing as inactive
 router.patch(
-  "/listings/markListingInactive/:id",
+  "/listings/markInactive/:id",
   validateResource(listingParamsSchema),
   markListingAsInactiveHandler,
 );
