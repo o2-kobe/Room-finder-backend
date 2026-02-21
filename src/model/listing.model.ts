@@ -18,7 +18,7 @@ export interface Pricing {
   };
 }
 
-export type RoomType =
+export type RoomTypes =
   | "1-in-a-room"
   | "2-in-a-room"
   | "3-in-a-room"
@@ -41,7 +41,7 @@ export interface ListingDocument extends Document {
   amenities: string[];
   location: Location;
   pricing: Pricing;
-  roomType: RoomType;
+  roomTypes: RoomTypes;
   availabilityStatus: "available" | "inactive";
   contact: Contact;
   createdBy: Types.ObjectId;
@@ -139,12 +139,12 @@ const listingSchema = new Schema<ListingDocument>(
     listingType: { type: String, enum: ["hostel", "private"], required: true },
     images: {
       type: [String],
-      validate: {
-        validator: function (val: string[]) {
-          return val.length > 0;
-        },
-        message: "At least one image is required",
-      },
+      // validate: {
+      //   validator: function (val: string[]) {
+      //     return val.length > 0;
+      //   },
+      //   message: "At least one image is required",
+      // },
     },
     amenities: {
       type: [String],
@@ -152,7 +152,7 @@ const listingSchema = new Schema<ListingDocument>(
     },
     location: { type: locationSchema, required: true },
     pricing: { type: pricingSchema, required: true },
-    roomType: {
+    roomTypes: {
       type: String,
       enum: [
         "1-in-a-room",
@@ -186,12 +186,18 @@ listingSchema.set("toJSON", {
 });
 
 // Indexes
-// ListingSchema.index({ type: 1 });
-// ListingSchema.index({ price: 1 });
-// ListingSchema.index({ availability: 1 });
-// ListingSchema.index({ "location.university": 1 });
-// ListingSchema.index({ "location.area": 1 });
-// ListingSchema.index({ createdAt: -1 });
+listingSchema.index({ listingType: 1, availabilityStatus: 1 });
+listingSchema.index({
+  title: "text",
+  "location.university": "text",
+  "location.area": "text",
+});
+listingSchema.index({
+  listingType: 1,
+  availabilityStatus: 1,
+  pricing: 1,
+  _id: 1,
+});
 
 const Listing = model<ListingDocument>("Listing", listingSchema);
 
