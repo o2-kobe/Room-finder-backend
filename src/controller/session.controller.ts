@@ -69,9 +69,9 @@ export async function deleteSessionHandler(req: Request, res: Response) {
 
 export async function getSessionsHandler(req: Request, res: Response) {
   try {
-    const userId = res.locals.user._id;
-    const sessions = await getSessions({ user: userId, valid: true });
-    res.send(sessions);
+    const userId = res.locals.user.sub;
+    const sessions = await getSessions({ user: userId });
+    res.status(200).json({ sessions });
   } catch (error) {
     res.status(500).send({ message: "Something went wrong" });
   }
