@@ -57,6 +57,12 @@ router.post("/sessions/refresh", loginLimiter, refreshAccessTokenHandler);
 
 // Listing Routes
 // ---------------------------
+// Get paginated listings
+router.get("/listings", getListingsHandler);
+
+// Get Map listings
+router.get("/listings/map", getMapsListingsHandler);
+
 router.use(requireUser);
 
 // Create a listing
@@ -65,12 +71,6 @@ router.post(
   validateResource(createListingSchema),
   createListingHandler,
 );
-
-// Get paginated listings
-router.get("/listings", getListingsHandler);
-
-// Get Map listings
-router.get("/listings/map", getMapsListingsHandler);
 
 // Find one listing
 router.get(
