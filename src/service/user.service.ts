@@ -17,7 +17,12 @@ export async function findUser(query: QueryFilter<UserDocument>) {
 }
 
 export async function getUser(userId: string) {
-  const user = await User.findById(userId);
+  const user = await User.findById(userId).select({
+    email: 1,
+    role: 1,
+    username: 1,
+    _id: 0,
+  });
 
   if (!user) {
     throw new Error("Invalid credentials");
