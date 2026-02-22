@@ -4,7 +4,7 @@ import { z } from "zod";
 const userBody = z
   .object({
     username: z.string().min(4, "Username must be at least 4 characters"),
-    role: z.enum(["tenant", "landlord", "student"]),
+    role: z.enum(["hostelManager", "landlord", "student"]),
     email: z.email(),
     password: z
       .string()
