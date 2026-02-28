@@ -63,6 +63,13 @@ router.get("/listings", getListingsHandler);
 // Get Map listings
 router.get("/listings/map", getMapsListingsHandler);
 
+// Find one listing
+router.get(
+  "/listings/:id",
+  validateResource(listingParamsSchema),
+  findOneListingHandler,
+);
+
 router.use(requireUser);
 
 // Create a listing
@@ -70,13 +77,6 @@ router.post(
   "/listings",
   validateResource(createListingSchema),
   createListingHandler,
-);
-
-// Find one listing
-router.get(
-  "/listings/:id",
-  validateResource(listingParamsSchema),
-  findOneListingHandler,
 );
 
 // Delete listing
