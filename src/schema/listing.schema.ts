@@ -39,16 +39,18 @@ const baseListingBody = z.object({
   location: locationSchema,
   pricing: pricingSchema,
   roomTypes: z
-    .enum([
-      "1-in-a-room",
-      "2-in-a-room",
-      "3-in-a-room",
-      "4-in-a-room",
-      "More-than-4",
-      "Exclusive",
-    ])
+    .array(
+      z.enum([
+        "1-in-a-room",
+        "2-in-a-room",
+        "3-in-a-room",
+        "4-in-a-room",
+        "More-than-4",
+        "Exclusive",
+      ]),
+    )
     .optional(),
-  availabilityStatus: z.enum(["available", "occupied"]).default("available"),
+  availabilityStatus: z.enum(["available", "inactive"]).default("available"),
   contact: contactSchema,
 });
 

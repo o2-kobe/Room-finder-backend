@@ -41,7 +41,7 @@ export interface ListingDocument extends Document {
   amenities: string[];
   location: Location;
   pricing: Pricing;
-  roomTypes: RoomTypes;
+  roomTypes: RoomTypes[];
   availabilityStatus: "available" | "inactive";
   contact: Contact;
   createdBy: Types.ObjectId;
@@ -153,7 +153,7 @@ const listingSchema = new Schema<ListingDocument>(
     location: { type: locationSchema, required: true },
     pricing: { type: pricingSchema, required: true },
     roomTypes: {
-      type: String,
+      type: [String],
       enum: [
         "1-in-a-room",
         "2-in-a-room",
@@ -162,6 +162,7 @@ const listingSchema = new Schema<ListingDocument>(
         "More-than-4",
         "Exclusive",
       ],
+      default: [],
     },
     availabilityStatus: {
       type: String,
@@ -186,6 +187,7 @@ listingSchema.set("toJSON", {
 });
 
 // Indexes
+listingSchema.index({ "location.coordinates": "2dsphere" });
 listingSchema.index({ listingType: 1, availabilityStatus: 1 });
 listingSchema.index({
   title: "text",
