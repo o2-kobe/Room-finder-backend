@@ -20,16 +20,20 @@ import {
   deleteListingHandler,
   findOneListingHandler,
   getListingsHandler,
+  getListingsOfPropertyOwnerHandler,
   getMapsListingsHandler,
   markListingAsAvailableHandler,
   markListingAsInactiveHandler,
   updateListingHandler,
+  updateListingPriceHandler,
 } from "./controller/listing.controller";
 import {
   createListingSchema,
   listingParamsSchema,
   updateListingSchema,
 } from "./schema/listing.schema";
+import { upload } from "./middleware/imageMiddleware";
+import parseJsonFields from "./middleware/parseJsonFields";
 
 const router = Router();
 
@@ -72,9 +76,14 @@ router.get(
 
 router.use(requireUser);
 
+// Get Listings Of property owner
+router.get("/listings-propertyOwner", getListingsOfPropertyOwnerHandler);
+
 // Create a listing
 router.post(
   "/listings",
+  upload.array("images", 3),
+  parseJsonFields,
   validateResource(createListingSchema),
   createListingHandler,
 );
@@ -106,5 +115,8 @@ router.patch(
   validateResource(listingParamsSchema),
   markListingAsInactiveHandler,
 );
+
+// Update Listing price
+router.patch("/updateListingPrice/:id", updateListingPriceHandler);
 
 export default router;

@@ -166,3 +166,12 @@ export const updateListingSchema = z.object({
 });
 
 export type UpdateListingInput = z.infer<typeof updateListingBody>;
+
+export const updateListingPriceSchema = z.object({
+  body: z.object({
+    price: z.number().positive().optional(),
+  }),
+  params: z.object({
+    id: z.string().regex(/^[0-9a-f]{24}$/, "Invalid MongoDB ID"),
+  }),
+});

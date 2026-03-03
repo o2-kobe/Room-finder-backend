@@ -46,7 +46,7 @@ export async function createSessionHandler(req: Request, res: Response) {
       { expiresIn: accessTokenTtl },
     );
 
-    return res.status(200).json({ accessToken });
+    res.status(200).json({ accessToken });
   } catch (error) {
     logger.error(error);
     res.status(401).json({

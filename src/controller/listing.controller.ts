@@ -5,10 +5,12 @@ import {
   deleteListing,
   getListingById,
   getListings,
+  getListingsByOwner,
   getMapListings,
   markListingAsAvailable,
   markListingAsInactive,
   updateListing,
+  updateListingPrice,
 } from "../service/listing.service";
 import { ListingQuery } from "../schema/listing.schema";
 import logger from "../utils/logger";
@@ -17,9 +19,21 @@ import { AppError } from "../utils/AppError";
 export const createListingHandler = TryCatch(
   async (req: Request, res: Response) => {
     const userId = res.locals.user.sub;
+
     const listingData = req.body;
 
-    const listing = await createListing(listingData, userId);
+    // Get uploaded files
+    const files = req.files as Express.Multer.File[];
+
+    const imageUrls = files?.map((file) => `/uploads/${file.filename}`);
+
+    const listing = await createListing(
+      {
+        ...listingData,
+        images: imageUrls,
+      },
+      userId,
+    );
 
     return {
       status: 201,
@@ -110,6 +124,19 @@ export const getMapsListingsHandler = async (
   }
 };
 
+// Get Listings By Owner
+export const getListingsOfPropertyOwnerHandler = TryCatch(
+  async (req: Request, res: Response) => {
+    const userId = res.locals.user.sub;
+
+    const listings = await getListingsByOwner(userId);
+
+    return listings;
+  },
+  "GetListingsOfPropertyOwnerHandler",
+);
+
+// Find one listing
 export const findOneListingHandler = TryCatch(
   async (req: Request, res: Response) => {
     const listingId = req.params.id as string;
@@ -170,4 +197,21 @@ export const markListingAsInactiveHandler = TryCatch(
     return inactiveListing;
   },
   "MarkListingAsInactiveHandler",
+);
+
+export const updateListingPriceHandler = TryCatch(
+  async (req: Request, res: Response) => {
+    const userId = res.locals.user.sub;
+    const listingId = req.params.id as string;
+    const newPrice = req.body;
+
+    const updatedListing = await updateListingPrice(
+      newPrice,
+      listingId,
+      userId,
+    );
+
+    return updatedListing;
+  },
+  "UpdateListingPriceHandler",
 );

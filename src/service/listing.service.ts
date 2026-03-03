@@ -155,5 +155,48 @@ export async function updateListing(
 }
 
 export async function getListingsByOwner(createdBy: string) {
-  return await Listing.find({ createdBy });
+  return await Listing.find({ createdBy }).sort({ _id: -1 });
+}
+
+export async function updateListingPrice(
+  newPrice: string,
+  listingId: string,
+  userId: string,
+) {
+  const listing = await Listing.findOne({
+    _id: listingId,
+    createdBy: userId,
+  }).lean();
+
+  if (!listing) throw Errors.notFound("Listing does not exist");
+
+  if (listing.listingType === "hostel") {
+    const updatedHostel = await Listing.findByIdAndUpdate(
+      listingId,
+      {
+        $set: { "pricing.priceRange.max": newPrice },
+      },
+      {
+        returnDocument: "after",
+      },
+    );
+
+    if (!updatedHostel) throw Errors.forbidden("Failed to update hostel");
+
+    return updatedHostel;
+  } else {
+    const updatedRental = await Listing.findByIdAndUpdate(
+      listingId,
+      {
+        $set: { "pricing.monthlyRent": newPrice },
+      },
+      {
+        returnDocument: "after",
+      },
+    );
+
+    if (!updatedRental) throw Errors.forbidden("Failed to update hostel");
+
+    return updatedRental;
+  }
 }

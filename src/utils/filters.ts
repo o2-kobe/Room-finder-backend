@@ -28,7 +28,7 @@ export function buildFilterQuery(
   }
 
   // Price Filtering (max budget logic)
-  if (filters.price) {
+  if (filters.price !== undefined) {
     conditions.push({
       $or: [
         // Private rentals → monthly price
