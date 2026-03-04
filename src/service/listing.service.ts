@@ -163,6 +163,12 @@ export async function updateListingPrice(
   listingId: string,
   userId: string,
 ) {
+  const numericPrice = Number(newPrice);
+
+  if (isNaN(numericPrice)) {
+    throw Errors.badRequest("Invalid price value");
+  }
+
   const listing = await Listing.findOne({
     _id: listingId,
     createdBy: userId,
@@ -188,7 +194,7 @@ export async function updateListingPrice(
     const updatedRental = await Listing.findByIdAndUpdate(
       listingId,
       {
-        $set: { "pricing.monthlyRent": newPrice },
+        $set: { "pricing.monthlyPrice": newPrice },
       },
       {
         returnDocument: "after",

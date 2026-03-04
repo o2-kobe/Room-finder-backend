@@ -139,12 +139,12 @@ const listingSchema = new Schema<ListingDocument>(
     listingType: { type: String, enum: ["hostel", "private"], required: true },
     images: {
       type: [String],
-      // validate: {
-      //   validator: function (val: string[]) {
-      //     return val.length > 0;
-      //   },
-      //   message: "At least one image is required",
-      // },
+      validate: {
+        validator: function (val: string[]) {
+          return val.length > 0;
+        },
+        message: "At least one image is required",
+      },
     },
     amenities: {
       type: [String],
