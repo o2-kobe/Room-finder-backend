@@ -159,13 +159,11 @@ export async function getListingsByOwner(createdBy: string) {
 }
 
 export async function updateListingPrice(
-  newPrice: string,
+  newPrice: number,
   listingId: string,
   userId: string,
 ) {
-  const numericPrice = Number(newPrice);
-
-  if (isNaN(numericPrice)) {
+  if (isNaN(newPrice) || newPrice <= 0) {
     throw Errors.badRequest("Invalid price value");
   }
 
@@ -183,7 +181,7 @@ export async function updateListingPrice(
         $set: { "pricing.priceRange.max": newPrice },
       },
       {
-        returnDocument: "after",
+        new: true,
       },
     );
 
@@ -197,7 +195,7 @@ export async function updateListingPrice(
         $set: { "pricing.monthlyPrice": newPrice },
       },
       {
-        returnDocument: "after",
+        new: true,
       },
     );
 
