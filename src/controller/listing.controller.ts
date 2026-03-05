@@ -203,7 +203,7 @@ export const updateListingPriceHandler = TryCatch(
   async (req: Request, res: Response) => {
     const userId = res.locals.user.sub;
     const listingId = req.params.id as string;
-    const newPrice = req.body;
+    const { newPrice } = req.body;
 
     const updatedListing = await updateListingPrice(
       newPrice,
