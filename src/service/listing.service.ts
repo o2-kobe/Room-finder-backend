@@ -181,7 +181,7 @@ export async function updateListingPrice(
         $set: { "pricing.priceRange.max": newPrice },
       },
       {
-        new: true,
+        returnDocument: "after",
       },
     );
 
@@ -195,7 +195,7 @@ export async function updateListingPrice(
         $set: { "pricing.monthlyPrice": newPrice },
       },
       {
-        new: true,
+        returnDocument: "after",
       },
     );
 
